@@ -16,8 +16,30 @@ param scheduledActionName string
 ])
 param kind string
 
-@description('Required if kind is "Email". The resource ID of the view to which the scheduled action will send. The view must either be private (tenant level) or owned by the same scope as the scheduled action.')
+@description('Optional. Specifies which built-in view to use. This is a shortcut for the full view ID. Allowed: AccumulatedCosts, DailyCosts, InvoiceDetails. Ignored if kind is "InsightAlert".')
+@allowed([
+  'AccumulatedCosts'
+  'DailyCosts'
+  'InvoiceDetails'
+])
+param builtInView string
+
+@description('Required if kind is "Email" and builtInView is not set. The resource ID of the view to which the scheduled action will send. The view must either be private (tenant level) or owned by the same scope as the scheduled action. Ignored if kind is "InsightAlert" or if builtInView is set.')
 param viewId string
+var internalViewId = builtInView == null ? viewId : '${subscription().id}/providers/Microsoft.CostManagement/views/ms:${builtInView}'
+
+@description('Optional. The display name to show in the portal when viewing the list of scheduled actions. Default: scheduledActionName.')
+param displayName string = scheduledActionName
+
+@description('Optional. The status of the scheduled action. Allowed: Enabled, Disabled. Default: Enabled.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param status string = 'Enabled'
+
+@description('Optional. Email address of the person or team responsible for this scheduled action. This email address will be included in emails.')
+param notificationEmail string
 
 @description('Required. List of email addresses that should receive emails. At least one valid email address is required.')
 param emailRecipients array
@@ -36,15 +58,8 @@ param emailLanguage string = 'en'
 @description('Optional. The regional format that will be used for dates, times, and numbers. Default: en-US.')
 param emailRegionalFormat string = 'en-US'
 
-@description('Optional. The display name to show in the portal when viewing the list of scheduled actions. Default: scheduledActionName.')
-param displayName string = scheduledActionName
-
-@description('Optional. The status of the scheduled action. Allowed: Enabled, Disabled. Default: Enabled.')
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-param status string = 'Enabled'
+@description('Optional. Indicates whether to include a link to a CSV file with the backing data for the chart. Default: false. Ignored if kind is "InsightAlert".')
+param includeCsv bool
 
 @description('Required if kind is "Email". The frequency at which the scheduled action will run. Allowed: Daily, Weekly, Monthly.')
 @allowed([
@@ -70,12 +85,6 @@ param scheduleStartDate string
 @description('Required if kind is "Email". The last day the schedule should run. Must be in the format yyyy-MM-dd. Ignored if kind is "InsightAlert".')
 param scheduleEndDate string
 
-@description('Optional. Indicates whether to include a link to a CSV file with the backing data for the chart. Default: false. Ignored if kind is "InsightAlert".')
-param includeCsv bool
-
-@description('Optional. Email address of the person or team responsible for this scheduled action. This email address will be included in emails.')
-param notificationEmail string
-
 /**
  * Resources
  */
@@ -86,7 +95,7 @@ resource sa 'Microsoft.CostManagement/scheduledActions@2022-10-01' = {
   properties: {
     scope: subscription().id
     displayName: displayName
-    viewId: kind == 'InsightAlert' ? '/providers/Microsoft.CostManagement/views/ms:DailyAnomalyByResourceGroup' : viewId
+    viewId: kind == 'InsightAlert' ? '/providers/Microsoft.CostManagement/views/ms:DailyAnomalyByResourceGroup' : internalViewId
     notificationEmail: notificationEmail
     status: status
     fileDestination: {
