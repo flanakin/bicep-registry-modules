@@ -50,6 +50,7 @@ module anomalyAlert `br/public:cogs/cost/scheduled-action:1.0` = {
     displayName: 'My anomaly check'
     emailRecipients: ['']
   }
+}
 ```
 
 ### Example 2
@@ -57,18 +58,18 @@ module anomalyAlert `br/public:cogs/cost/scheduled-action:1.0` = {
 Creating a scheduled alert for a saved view called MyView.
 
 ```bicep
-module dailyCostsAlert `br/public:cogs/cost/scheduled-action:1.0` = {
-  name: 'dailyCostsAlert'
-  kind: 'Email'
+module scheduledAlert `br/public:cogs/cost/scheduled-action:1.0` = {
+  name: 'scheduledAlert'
   params: {
-    scheduledActionName: 'DailyCostsAlert'
+    scheduledActionName: 'myScheduledAlert'
+    displayName: 'My scheduled alert'
     kind: 'Email'
     viewId: '/subscriptions/##-#-#-#-###/providers/Microsoft.CostManagement/views/MyView'
-    displayName: 'My schedule'
     emailRecipients: ['']
     scheduleFrequency: 'Weekly'
     scheduleDaysOfWeek: ['Monday']
     scheduleStartDate: '2023-01-01T08:00Z'
     scheduleEndDate: '2024-01-01T08:00Z'
   }
+}
 ```
