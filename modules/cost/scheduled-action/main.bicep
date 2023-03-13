@@ -124,4 +124,5 @@ resource sa 'Microsoft.CostManagement/scheduledActions@2022-10-01' = {
  * Outputs
  */
 
+@description('Resource ID of the scheduled action.')
 output scheduledActionId string = sa.id
