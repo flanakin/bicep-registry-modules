@@ -40,7 +40,7 @@ Use this module within other Bicep templates to simplify creating and updating s
 
 ### Example 1
 
-Creating a scheduled alert for the DailyCosts built-in view.
+Creates a shared scheduled action for the DailyCosts built-in view.
 
 ```bicep
 module dailyCostsAlert 'br/public:cost/resourcegroup-scheduled-action:1.0' = {
@@ -52,8 +52,27 @@ module dailyCostsAlert 'br/public:cost/resourcegroup-scheduled-action:1.0' = {
     emailRecipients: [ 'ema@contoso.com' ]
     scheduleFrequency: 'Weekly'
     scheduleDaysOfWeek: [ 'Monday' ]
-    scheduleStartDate: '2024-01-01T08:00Z'
-    scheduleEndDate: '2025-01-01T08:00Z'
+  }
+}
+```
+
+### Example 2
+
+Creates a private scheduled action for the DailyCosts built-in view with custom start/end dates.
+
+```bicep
+module privateAlert 'br/public:cost/resourcegroup-scheduled-action:1.0' = {
+  name: 'privateAlert'
+  params: {
+    name: 'PrivateAlert'
+    displayName: 'My private schedule'
+    private: true
+    builtInView: 'DailyCosts'
+    emailRecipients: [ 'priya@contoso.com' ]
+    scheduleFrequency: 'Monthly'
+    scheduleDayOfMonth: 1
+    scheduleStartDate: scheduleStartDate
+    scheduleEndDate: scheduleEndDate
   }
 }
 ```
